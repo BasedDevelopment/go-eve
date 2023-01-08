@@ -1,4 +1,4 @@
-module github.com/BasedDevelopment/eve
+module github.com/BasedDevelopment/libeve
 
 go 1.19
 
