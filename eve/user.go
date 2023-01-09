@@ -1,10 +1,44 @@
 package eve
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // GetSelf returns the data for the current authenticated user
 func (c *Client) GetSelf() (User, error) {
-	return User{}, nil
+	_, body, err := c.makeRequest("/me", "GET", nil)
+
+	if err != nil {
+		return User{}, err
+	}
+
+	m, err := time.Parse(time.RFC3339, body["created"].(string))
+
+	if err != nil {
+		return User{}, err
+	}
+
+	l, err := time.Parse(time.RFC3339, body["last_login"].(string))
+
+	if err != nil {
+		return User{}, err
+	}
+
+	uid, err := uuid.Parse(body["id"].(string))
+
+	if err != nil {
+		return User{}, nil
+	}
+
+	return User{
+		Name:      body["name"].(string),
+		ID:        uid,
+		Email:     body["email"].(string),
+		Created:   m,
+		LastLogin: l,
+	}, nil
 }
 
 // UpdateSelf updates the current authenticated user with the data in the u
